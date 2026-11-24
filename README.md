@@ -1,5 +1,7 @@
 # Deploy and Host Drizzle Gateway with Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/drizzle-gateway-18-with-postgresql-18?referralCode=20H68q)
+
 Drizzle Gateway is the Drizzle Team's self-hosted server for Drizzle Studio, the database browser of the Drizzle ORM ecosystem. This template deploys Drizzle Gateway 1.8 behind a generated master password, next to a PostgreSQL 18 database on Railway's private network, so you can browse and edit data in Drizzle Studio from your own infrastructure.
 
 ## About Hosting Drizzle Gateway
