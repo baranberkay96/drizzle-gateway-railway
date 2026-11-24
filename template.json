@@ -1,0 +1,141 @@
+{
+  "name": "Drizzle Gateway 1.8 with PostgreSQL 18",
+  "description": "Self-hosted Drizzle Studio behind a master password, plus Postgres 18.",
+  "category": "Storage",
+  "tags": [
+    "drizzle",
+    "drizzle-studio",
+    "drizzle-gateway",
+    "postgresql",
+    "database",
+    "admin",
+    "gui"
+  ],
+  "image": "https://cdn.jsdelivr.net/gh/drizzle-team/drizzle-orm/misc/readme/logo-github-sq-dark.svg",
+  "upstream": {
+    "gateway": "ghcr.io/drizzle-team/gateway:1.8.0@sha256:aa4043b95d7668905415db777c20f7255eb80e469fc07d6c4a5a176eb6f572bb (Drizzle Gateway 1.8.0, released 2026-11-11; free closed-source binary)",
+    "postgres": "ghcr.io/railwayapp-templates/postgres-ssl:18.7@sha256:0abac5c0e29ac4fb1633aa644b4f3beaef29a05b4dc05f93190b5a7fbb0e7089 (= :18 on 2026-11-24)",
+    "checked": "2026-11-24"
+  },
+  "services": {
+    "Drizzle Gateway": {
+      "icon": "https://cdn.jsdelivr.net/gh/drizzle-team/drizzle-orm/misc/readme/logo-github-sq-dark.svg",
+      "source": {
+        "repo": "baranberkay96/drizzle-gateway-railway",
+        "rootDirectory": "/services/gateway"
+      },
+      "healthcheckPath": "/health",
+      "healthcheckTimeout": 300,
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "publicDomain": true,
+      "targetPort": 4983,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/app"
+      },
+      "variables": {
+        "PORT": {
+          "defaultValue": "4983",
+          "description": "Port the gateway listens on (public domain and healthcheck).",
+          "required": false
+        },
+        "MASTERPASS": {
+          "defaultValue": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Master password, 8-128 characters (generated). Full admin access; without it the gateway would be open, so the template never starts without one.",
+          "required": false
+        },
+        "STORE_PATH": {
+          "defaultValue": "/app",
+          "description": "Where the gateway keeps saved connections and sessions (the volume).",
+          "required": false
+        },
+        "SESSION_TTL_DAYS": {
+          "defaultValue": "30",
+          "description": "Days a login session stays valid.",
+          "required": false
+        },
+        "DATABASE_URL": {
+          "defaultValue": "${{Postgres.DATABASE_URL}}",
+          "description": "Bundled Postgres URL. In the gateway, add a PostgreSQL connection and pick this variable from the environment list.",
+          "required": false
+        }
+      }
+    },
+    "Postgres": {
+      "icon": "https://devicons.railway.app/i/postgresql.svg",
+      "source": {
+        "image": "ghcr.io/railwayapp-templates/postgres-ssl:18.7@sha256:0abac5c0e29ac4fb1633aa644b4f3beaef29a05b4dc05f93190b5a7fbb0e7089"
+      },
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "publicDomain": false,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/var/lib/postgresql/data"
+      },
+      "variables": {
+        "PGDATA": {
+          "defaultValue": "/var/lib/postgresql/data/pgdata",
+          "description": "Location where the database will be initialized.",
+          "required": false
+        },
+        "PGHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Railway private domain name.",
+          "required": false
+        },
+        "PGPORT": {
+          "defaultValue": "5432",
+          "description": "Port to connect to Postgres.",
+          "required": false
+        },
+        "PGUSER": {
+          "defaultValue": "${{ POSTGRES_USER }}",
+          "description": "User for the Railway Data panel.",
+          "required": false
+        },
+        "PGDATABASE": {
+          "defaultValue": "${{POSTGRES_DB}}",
+          "description": "Database for the Railway Data panel.",
+          "required": false
+        },
+        "PGPASSWORD": {
+          "defaultValue": "${{POSTGRES_PASSWORD}}",
+          "description": "Password for the Railway Data panel.",
+          "required": false
+        },
+        "POSTGRES_DB": {
+          "defaultValue": "railway",
+          "description": "Default database created when the image first starts.",
+          "required": false
+        },
+        "DATABASE_URL": {
+          "defaultValue": "postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}",
+          "description": "Private connection URL for other services in this project.",
+          "required": false
+        },
+        "POSTGRES_USER": {
+          "defaultValue": "postgres",
+          "description": "Superuser created when the image first starts.",
+          "required": false
+        },
+        "SSL_CERT_DAYS": {
+          "defaultValue": "820",
+          "description": "SSL certificate expiry in days.",
+          "required": false
+        },
+        "POSTGRES_PASSWORD": {
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+          "description": "Superuser password (generated).",
+          "required": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "60",
+          "description": "Allow Postgres to shut down cleanly.",
+          "required": false
+        }
+      }
+    }
+  }
+}
