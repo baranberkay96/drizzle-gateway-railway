@@ -68,7 +68,7 @@ Estimated cost: idle ≈ $2/month (0.16 GB RAM + ~0.3 GB volumes); typical ≈ $
 - [x] `DATABASE_URL` appears in the gateway's environment list; added a PostgreSQL connection from it and ran `select current_database(), version()` → `railway`, 18.7.
 - [x] `MASTERPASS=abc` and `SESSION_TTL_DAYS=-1` (STANDARD 8.29): deploy SUCCESS, warnings logged, gateway locked (still 401 without session, `abc` rejected), TTL default used.
 - [x] Valid MASTERPASS again: login works; the saved connection survived the redeploys (volume).
-- [ ] Post-publish deploy by the real template id (`ship.py publish`).
+- [x] Post-publish deploy by the real template id: PASS (2026-11-24).
 
 ## Open questions
 
