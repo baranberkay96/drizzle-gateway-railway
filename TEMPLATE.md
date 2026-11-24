@@ -52,11 +52,23 @@ Railway base service (`_railway-base/postgres.json` values), volume `/var/lib/po
 
 ## Resource estimate
 
-RESOURCE_PLACEHOLDER
+Measured on the test deploy (2026-11-24, idle after login, adding a connection and running SQL): Drizzle Gateway 40-60 MiB, Postgres ~110 MiB, CPU < 0.01 vCPU.
+
+| Service | Idle RAM | Typical RAM | CPU |
+|---|---|---|---|
+| Drizzle Gateway | 50 MB | 80-200 MB (large introspection, exports) | < 0.01 idle |
+| Postgres | 110 MB | 200-500 MB | 0.01-0.3 |
+
+Estimated cost: idle ≈ $2/month (0.16 GB RAM + ~0.3 GB volumes); typical ≈ $3-8/month. Minimum plan: **Trial** (both far under 1 GB).
 
 ## Verification checklist
 
-CHECKLIST_PLACEHOLDER
+- [x] Both services SUCCESS; `/health` 200 (it checks the store file on the volume; `init` reports `isVolumeSet: true`).
+- [x] API without a session → 401; wrong master password → 400; generated `MASTERPASS` → session, `isMaster: true`, version 1.8.0.
+- [x] `DATABASE_URL` appears in the gateway's environment list; added a PostgreSQL connection from it and ran `select current_database(), version()` → `railway`, 18.7.
+- [x] `MASTERPASS=abc` and `SESSION_TTL_DAYS=-1` (STANDARD 8.29): deploy SUCCESS, warnings logged, gateway locked (still 401 without session, `abc` rejected), TTL default used.
+- [x] Valid MASTERPASS again: login works; the saved connection survived the redeploys (volume).
+- [ ] Post-publish deploy by the real template id (`ship.py publish`).
 
 ## Open questions
 
